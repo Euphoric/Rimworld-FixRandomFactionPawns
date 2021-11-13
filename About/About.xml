@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ModMetaData>
+  <name>Fix random faction pawns</name>
+  <author>Euphoric</author>
+  <packageId>Euphoric.FixRandomFactionPawns</packageId>
+  <supportedVersions>
+    <li>1.3</li>
+  </supportedVersions>
+  <modDependencies>
+  </modDependencies>
+  <loadAfter>
+  </loadAfter>
+  <description>Fixes random pawns being generated in factions.</description>
+</ModMetaData>
