@@ -20,8 +20,11 @@ namespace Euphoric.FixRandomFactionPawns
 
             if (!faction.def.humanlikeFaction)
                 return true; // insects, mechanoids, etc..
-            
+
             var factionDef = faction.def;
+
+            if (factionDef == FactionDefOf.Ancients || factionDef == FactionDefOf.AncientsHostile)
+                return true; // anyone can be part of ancients
 
             var allowedFactions = AllowedFactionPawns.Instance.GetFactionsForPawnKind(pawnKindDef);
 
