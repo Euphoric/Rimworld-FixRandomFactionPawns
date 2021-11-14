@@ -1,34 +1,63 @@
 ﻿using HarmonyLib;
+using RimWorld;
 using Verse;
 
 namespace Euphoric.FixRandomFactionPawns
 {
     /// <summary>
-    /// Warn if trying to generate pawn for faction that doesn't have PawnKind set up.
+    /// Generates warning when trying to create pawn with faction into which it doesn't belong. 
     /// </summary>
-    [HarmonyPatch(typeof(PawnGenerator), "GeneratePawn", typeof(PawnGenerationRequest))]
-    internal static class PawnGeneratorGeneratePawnWarnPatch
+    [HarmonyPatch]
+    internal static class PawnFactionWarnPatch
     {
-        [HarmonyPrefix]
-        public static void Prefix(PawnGenerationRequest request)
+        private static bool IsAllowedFaction(Faction faction, PawnKindDef pawnKindDef)
         {
-            if (request.Faction == null)
-                return; // most likely an animal
+            if (faction == null)
+                return true; // most likely an animal
 
-            if (request.Faction.IsPlayer)
-                return;
+            if (faction.IsPlayer)
+                return true;
+
+            if (!faction.def.humanlikeFaction)
+                return true; // insects, mechanoids, etc..
             
-            if (!request.Faction.def.humanlikeFaction)
-                return; // insects, mechanoids, etc..
-            
-            var pawnKindDef = request.KindDef;
-            var faction = request.Faction.def;
+            var factionDef = faction.def;
 
             var allowedFactions = AllowedFactionPawns.Instance.GetFactionsForPawnKind(pawnKindDef);
 
-            if (!allowedFactions.Contains(faction))
+            var isAllowedFaction = allowedFactions.Contains(factionDef);
+            return isAllowedFaction;
+        }
+
+        /// <summary>
+        /// Warn if trying to generate pawn for faction that doesn't have PawnKind set up.
+        /// </summary>
+        [HarmonyPatch(typeof(PawnGenerator), "GeneratePawn", typeof(PawnGenerationRequest))]
+        [HarmonyPrefix]
+        public static void PawnGeneratorGeneratePawn_Prefix(PawnGenerationRequest request)
+        {
+            var faction = request.Faction;
+            var pawnKindDef = request.KindDef;
+            if (!IsAllowedFaction(faction, pawnKindDef))
             {
-                Log.Warning($"Generated pawn [{pawnKindDef}] for faction [{faction}] which shouldn't have that kind of pawn.");
+                Log.Warning($"Generated pawn [{pawnKindDef}] for faction [{faction?.def}] which shouldn't have that kind of pawn.");
+            }
+        }
+
+        /// <summary>
+        /// Warn if trying to set faction to a pawn, where that pawn doesn't belong to that faction.
+        /// </summary>
+        [HarmonyPatch(typeof(Pawn), "SetFaction")]
+        [HarmonyPrefix]
+        // ReSharper disable once InconsistentNaming
+        public static void PawnSetFaction_Prefix(Pawn __instance, Faction newFaction)
+        {
+            var pawnKindDef = __instance.kindDef;
+
+            if (!IsAllowedFaction(newFaction, pawnKindDef))
+            {
+                Log.Warning(
+                    $"Setting faction [{newFaction.def}] to pawn [{pawnKindDef}], where faction shouldn't have that kind of pawn.");
             }
         }
     }
