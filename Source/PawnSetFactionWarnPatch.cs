@@ -23,7 +23,7 @@ namespace Euphoric.FixRandomFactionPawns
 
             if (!allowedFactions.Contains(faction))
             {
-                Log.Warning($"Generated pawn [{pawnKindDef}] for faction [{faction}] which shouldn't have that kind of pawn.");
+                Log.Warning($"Setting faction [{faction}] to pawn [{pawnKindDef}], where faction shouldn't have that kind of pawn.");
             }
         }
     }
