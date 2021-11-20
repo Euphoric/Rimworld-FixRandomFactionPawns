@@ -1,0 +1,17 @@
+[b]Fixes random pawns being generated in factions.[/b]
+
+[h2]About[/h2]
+
+When generating pawns of specific kind, Rimworld can select a random faction to put that pawn into. This can result in random colonists, villagers or refugees in groups from a faction. This is most noticeable when using Hospitality along with alien races faction, as it results in normal human pawns being part of visitor groups.
+
+This mod changes that behavior so that only factions into which the pawn can belong to can be selected. So no longer you see villagers being part of Moyo visitors.
+
+[h2]FAQ[/h2]
+
+This mod can be added or removed in the middle of the game.
+But it won't have much effect if added halfway as it won't change incorrect pawns already in faction.
+It will only work if used from the very beginning of a game.
+
+[h2]Contribution[/h2]
+
+Issues, bugreports and feature requests go on [url=https://github.com/Euphoric/Rimworld-FixRandomFactionPawns]GitHub page[/url].
