@@ -28,23 +28,28 @@ namespace Euphoric.FixRandomFactionPawns
                         return false;
                     return minTechLevel == TechLevel.Undefined || x.def.techLevel >= minTechLevel;
                 })
-                .Select(f => new
-                    { faction = f, weight = tryMedievalOrBetter && f.def.techLevel < TechLevel.Medieval ? 0.1f : 1f });
-
-            // var sb = new StringBuilder();
-            // sb.AppendLine($"Factions to select for [{forPawnKindDef}] from: ");
-            // foreach (var fw in factionsToSelectFrom)
-            // {
-            //     sb.AppendLine(fw.faction.def.defName + ":" + fw.weight);
-            // }
-            // Log.Message(sb.ToString());
+                .Select(f => new { faction = f, weight = tryMedievalOrBetter && f.def.techLevel < TechLevel.Medieval ? 0.1f : 1f })
+                .ToList();
 
             var foundFaction = factionsToSelectFrom.TryRandomElementByWeight(x => x.weight, out var factionWithWeight);
-
-            faction = factionWithWeight.faction;
+            
             //Log.Message($"Selected faction [{foundFaction}], [{faction.def}]");
 
-            return foundFaction;
+            if (!foundFaction)
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine($"Unable to find faction for pawn def {forPawnKindDef}. Defaulting to original method.");
+                var factionsString = string.Join(",", DefDatabase<FactionDef>.AllDefs.Select(x => x.defName));
+                sb.AppendLine($"Factions:{factionsString}");
+                Log.Warning(sb.ToString());
+
+                return factionManager.TryGetRandomNonColonyHumanlikeFaction(out faction, tryMedievalOrBetter, allowDefeated, minTechLevel, allowTemporary);
+            }
+            else
+            {
+                faction = factionWithWeight.faction;
+                return true;
+            }
         }
     }
 }
